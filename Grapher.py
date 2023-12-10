@@ -80,7 +80,16 @@ class Grapher:
                     return cls.function((1 - t) * t1 + t * t2)
                 else: return None
             return Grapher.ParametricCurve(funct, (0, 1))
-
+        
+        @staticmethod
+        def to3D(function):
+            """
+            Chuyển tham số từ R^2 sang R^3, với tọa độ thứ ba đồng nhất bằng 0.
+            """
+            def funct(t):
+                return np.append(function(t), 0)
+            return funct
+        
 class SpaceFillingCurve:
     def __init__(self, operation, starting_seeds, *args):
         self.starting_seeds = starting_seeds

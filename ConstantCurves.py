@@ -47,7 +47,7 @@ class ConstantCurves:
                 with open(path, "r") as f:
                     points = json.load(f)
         def funct(t):
-            return points[t]
+            return points[int(t)]
         return funct
     
 class TextBookCurve(ConstantCurves):
@@ -61,5 +61,3 @@ class TextBookCurve(ConstantCurves):
         """
         assert 1 <= n <= self.length, "Giá trị không hợp lệ."
         return 2 * 4 ** (n - 1)
-    
-curve = TextBookCurve()

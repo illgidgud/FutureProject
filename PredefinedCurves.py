@@ -2,6 +2,7 @@ import numpy as np
 from Grapher import SpaceFillingCurve
 from pathlib import Path
 import json
+import os
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -12,7 +13,7 @@ class NumpyEncoder(json.JSONEncoder):
 class PredefinedCurves:
     class TextBookCurve(SpaceFillingCurve):
         def __init__(self):
-            path = self.__class__.__name__
+            # path = self.__class__.__name__
             def operation(path_list):
                 new_path_list = []
                 a, b = path_list[0]["point"][0], path_list[0]["point"][1]
@@ -42,7 +43,7 @@ class PredefinedCurves:
                         new_path_list.append({"point": [end_points[2 * i], end_points[2 * i + 1], end_points[2 * i + 2]], "direction": directions[i]})
                 return new_path_list
             
-            super().__init__(operation = operation, starting_seeds = [{"point": [np.array([0, 0]), np.array([0.5, 0.5]), np.array([1, 0])], "direction": "u"}])
+            super().__init__(operation = operation, starting_seeds = [{"point": [np.array([-2, -2]), np.array([0, 0]), np.array([2, -2])], "direction": "u"}])
             for index in range(1, 9):
                 self._final_path_dict[index + 1] = self.operation(self._final_path_dict[index])
                 self.points_dict[index + 1] = SpaceFillingCurve.from_path_to_points(self._final_path_dict[index + 1])
@@ -66,6 +67,25 @@ class PredefinedCurves:
                 with open(path, "w") as f:
                     json.dump(data, f)
 
+        def gen_next_point_list(self):
+            """
+            Tạo danh sách điểm tiếp theo của points_dict, lưu trực tiếp ra file text.
+            """
+            path = Path(__file__).parent / f"ConstantCurves/{self.__class__.__name__}"
+            target_length = len(os.listdir(path)) + 4 + 1
+            new_path = path / f"Curve{target_length}.json"
+            current_length = len(self._final_path_dict)
+            if current_length >= target_length:
+                points = [point.tolist() for point in self.points_dict[target_length]]
+                with open(new_path, "w") as f:
+                    json.dump(points, f)
+            else:
+                times_to_append = target_length - current_length
+                for index in range(times_to_append):
+                    self._final_path_dict[current_length + index + 1] = self.operation(self._final_path_dict[current_length + index])
+                points = [point.tolist() for point in SpaceFillingCurve.from_path_to_points(self._final_path_dict[target_length])]
+                with open(new_path, "w") as f:
+                    json.dump(points, f)
         
     # class GeneralCurveSquareVersion(SpaceFillingCurve):
     #     def __init__(self):
@@ -100,3 +120,6 @@ class PredefinedCurves:
     #             self._final_path_list.append(self.operation(self._final_path_list[-1]))
     #             self.points_list.append(SpaceFillingCurve.from_path_to_points(self._final_path_list[-1]))
     #             self.parametric_curve.append(Grapher.ParametricCurve.line_through_points(self.points_list[-1]))
+
+curve = PredefinedCurves.TextBookCurve()
+curve.export_points_as_text()
