@@ -120,10 +120,10 @@ class PredefinedCurves:
                               *
                     start:  *   
                     """
-                    point2 = np.round(point1 + side_vectors[1], 7)
-                    point3 = np.round(point2 + side_vectors[0], 7)
-                    point4 = np.round(point3 + side_vectors[1], 7)
-                    point5 = np.round(point4 - side_vectors[0], 7)
+                    point2 = np.round(point1 + side_vectors[0], 7)
+                    point3 = np.round(point2 - side_vectors[1], 7)
+                    point4 = np.round(point3 - side_vectors[0], 7)
+                    point5 = np.round(point4 - side_vectors[1], 7)
                     return [point1, point2, point3, point4, point5]
                 
                 def gen_type3(point1: np.ndarray):
