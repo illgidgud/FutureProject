@@ -1,4 +1,7 @@
 import numpy as np
+from pathlib import Path
+import json
+import os
 
 class Grapher:
     class ParametricCurve:
@@ -91,7 +94,7 @@ class Grapher:
             return funct
         
 class SpaceFillingCurve:
-    def __init__(self, operation, starting_seeds, *args):
+    def __init__(self, operation, starting_seeds):
         self.starting_seeds = starting_seeds
         self.operation = operation
         self._final_path_dict = {1: self.starting_seeds}
@@ -136,3 +139,41 @@ class SpaceFillingCurve:
     def reset_path(self):
         self._final_path_dict = {1: self.starting_seeds}
         self.points_dict = {1: self.starting_seeds[0]["point"]}
+
+    def export_points_as_text(self, name):
+            """
+            Xuất points_dict ra file text, các điểm chuyển định dạng
+            từ nd.array thành iterable.
+            """
+            path = Path(__file__).parent / f"ConstantCurves/"
+            if not os.path.exists(path / name):
+                os.mkdir(path / name)
+            path = Path(__file__).parent / f"ConstantCurves/{name}/Curves1-5.json"
+            new_points_dict = {k:[point.tolist() for point in self.points_dict[k]] for k in range(1, 6)}
+            with open(path, "w") as f:
+                json.dump(new_points_dict, f, indent=2)
+            # for index in [6, 7, 8, 9]:
+            #     path = Path(__file__).parent / f"ConstantCurves/{name}/Curve{index}.json"
+            #     data = [point.tolist() for point in self.points_dict[index]]
+            #     with open(path, "w") as f:
+            #         json.dump(data, f)
+
+    def gen_next_point_list(self, name):
+            """
+            Tạo danh sách điểm tiếp theo của points_dict, lưu trực tiếp ra file text.
+            """
+            path = Path(__file__).parent / f"ConstantCurves/{name}"
+            target_length = len(os.listdir(path)) + 4 + 1
+            new_path = path / f"Curve{target_length}.json"
+            current_length = len(self._final_path_dict)
+            if current_length >= target_length:
+                points = [point.tolist() for point in self.points_dict[target_length]]
+                with open(new_path, "w") as f:
+                    json.dump(points, f)
+            else:
+                times_to_append = target_length - current_length
+                for index in range(times_to_append):
+                    self._final_path_dict[current_length + index + 1] = self.operation(self._final_path_dict[current_length + index])
+                points = [point.tolist() for point in SpaceFillingCurve.from_path_to_points(self._final_path_dict[target_length])]
+                with open(new_path, "w") as f:
+                    json.dump(points, f)

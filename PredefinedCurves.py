@@ -13,7 +13,6 @@ class NumpyEncoder(json.JSONEncoder):
 class PredefinedCurves:
     class TextBookCurve(SpaceFillingCurve):
         def __init__(self):
-            # path = self.__class__.__name__
             def operation(path_list):
                 new_path_list = []
                 a, b = path_list[0]["point"][0], path_list[0]["point"][1]
@@ -43,7 +42,7 @@ class PredefinedCurves:
                         new_path_list.append({"point": [end_points[2 * i], end_points[2 * i + 1], end_points[2 * i + 2]], "direction": directions[i]})
                 return new_path_list
             
-            super().__init__(operation = operation, starting_seeds = [{"point": [np.array([-2, -2]), np.array([0, 0]), np.array([2, -2])], "direction": "u"}])
+            super().__init__(operation=operation, starting_seeds=[{"point": [np.array([-2, -2]), np.array([0, 0]), np.array([2, -2])], "direction": "u"}])
             for index in range(1, 9):
                 self._final_path_dict[index + 1] = self.operation(self._final_path_dict[index])
                 self.points_dict[index + 1] = SpaceFillingCurve.from_path_to_points(self._final_path_dict[index + 1])
@@ -87,6 +86,109 @@ class PredefinedCurves:
                 with open(new_path, "w") as f:
                     json.dump(points, f)
         
+    class TriangleCurve(SpaceFillingCurve):
+        def __init__(self, begin_point: np.array, side_vectors: list):
+            increment = [np.round(vector / 2, 7) for vector in side_vectors]
+            point2 = np.round(begin_point - side_vectors[2], 7)
+            point3 = np.round(point2 - side_vectors[1], 7)
+            point4 = np.round(point3 - side_vectors[2], 7)
+            point5 = np.round(point4 + side_vectors[1], 7)
+            starting_seed = [{
+                "point": [begin_point, point2, point3, point4, point5],
+                "type": "type1", 
+            }]
+            def operation(path_list, side_vectors):
+                # side_vectors = [AB, BC, CA]; A bottom left; B top
+                # Create functions to generate points for four types of paths
+                def gen_type1(point1: np.ndarray):
+                    """
+                             *  *  *
+                               *     *
+                    start: *  *  *     *
+                    """
+                    point2 = np.round(point1 - side_vectors[2], 7)
+                    point3 = np.round(point2 - side_vectors[1], 7)
+                    point4 = np.round(point3 - side_vectors[2], 7)
+                    point5 = np.round(point4 + side_vectors[1], 7)
+                    return [point1, point2, point3, point4, point5]
+                
+                def gen_type2(point1: np.ndarray):
+                    """
+                    *       *
+                      *   *   *
+                        *       *
+                              *
+                    start:  *   
+                    """
+                    point2 = np.round(point1 + side_vectors[1], 7)
+                    point3 = np.round(point2 + side_vectors[0], 7)
+                    point4 = np.round(point3 + side_vectors[1], 7)
+                    point5 = np.round(point4 - side_vectors[0], 7)
+                    return [point1, point2, point3, point4, point5]
+                
+                def gen_type3(point1: np.ndarray):
+                    """
+                    start:  *
+                              *
+                         *  *   *
+                           *    
+                             *  *  *
+                    """
+                    point2 = np.round(point1 + side_vectors[1], 7)
+                    point3 = np.round(point2 + side_vectors[2], 7)
+                    point4 = np.round(point3 + side_vectors[1], 7)
+                    point5 = np.round(point4 - side_vectors[2], 7)
+                    return [point1, point2, point3, point4, point5]
+                
+                def gen_type4(point1: np.ndarray):
+                    """
+                    *  *  *     * start:
+                        *     *
+                      *  *  *   
+                    """
+                    point2 = np.round(point1 - side_vectors[0], 7)
+                    point3 = np.round(point2 + side_vectors[2], 7)
+                    point4 = np.round(point3 + side_vectors[0], 7)
+                    point5 = np.round(point4 + side_vectors[2], 7)
+                    return [point1, point2, point3, point4, point5]
+                
+                generators = {"type1": gen_type1, "type2": gen_type2, 
+                                 "type3": gen_type3, "type4": gen_type4,}
+                
+                type_pattern = {
+                    "type1": ["type1", "type2", "type1", "type3"],
+                    "type2": ["type2", "type1", "type2", "type4"],
+                    "type3": ["type3", "type4", "type3", "type1"],
+                    "type4": ["type4", "type3", "type4", "type2"],
+                    }
+                # browse path_list and implement operation
+                new_path_list = []
+                for path in path_list:
+                    pattern_list = type_pattern[path["type"]]
+                    for index in range(4):
+                        path_type = pattern_list[index]
+                        new_path_list.append(
+                            {
+                                "point": generators[path_type](path["point"][index]),
+                                "type": path_type
+                            }
+                        )
+                return new_path_list
+
+            super().__init__(operation, starting_seed)
+            for index in range(1, 5):
+                increment = [np.round(vector / 2, 7) for vector in increment]
+                self._final_path_dict[index + 1] = self.operation(self._final_path_dict[index], increment)
+                self.points_dict[index + 1] = SpaceFillingCurve.from_path_to_points(self._final_path_dict[index + 1])
+
+triangle_curve = PredefinedCurves.TriangleCurve(
+    np.array([-2, -2]), 
+    [np.array([2, 3.464], dtype=float), np.array([2, -3.464], dtype=float), np.array([-4, 0], dtype=float)]
+)
+
+triangle_curve.export_points_as_text("TriangleCurveOne")
+
+
     # class GeneralCurveSquareVersion(SpaceFillingCurve):
     #     def __init__(self):
     #         def operation(path_list):
@@ -121,5 +223,6 @@ class PredefinedCurves:
     #             self.points_list.append(SpaceFillingCurve.from_path_to_points(self._final_path_list[-1]))
     #             self.parametric_curve.append(Grapher.ParametricCurve.line_through_points(self.points_list[-1]))
 
-curve = PredefinedCurves.TextBookCurve()
-curve.export_points_as_text()
+# curve = PredefinedCurves.TextBookCurve()
+# curve.export_points_as_text()
+                
