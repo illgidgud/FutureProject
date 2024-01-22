@@ -155,21 +155,34 @@ class PredefinedCurves:
                 generators = {"type1": gen_type1, "type2": gen_type2, 
                                  "type3": gen_type3, "type4": gen_type4,}
                 
-                type_pattern = {
-                    "type1": ["type1", "type2", "type1", "type3"],
-                    "type2": ["type2", "type1", "type2", "type4"],
-                    "type3": ["type3", "type4", "type3", "type1"],
-                    "type4": ["type4", "type3", "type4", "type2"],
+                pattern = {
+                    "type1": {
+                        "type": ["type1", "type2", "type1", "type3"],
+                        "point_type": [0, 1, 2, 3]
+                        },
+                    "type2": {
+                        "type": ["type2", "type1", "type2", "type4"],
+                        "point_type": [0, 3, 1, 2]
+                        },
+                    "type3": {
+                        "type": ["type3", "type4", "type3", "type1"],
+                        "point_type": [0, 1, 2, 3]
+                        },
+                    "type4": {
+                        "type": ["type4", "type3", "type4", "type2"],
+                        "point_type": [0, 3, 1, 2]
+                        },
                     }
                 # browse path_list and implement operation
                 new_path_list = []
                 for path in path_list:
-                    pattern_list = type_pattern[path["type"]]
+                    type_list = pattern[path["type"]]["type"]
+                    point_list = pattern[path["type"]]["point_type"]
                     for index in range(4):
-                        path_type = pattern_list[index]
+                        path_type = type_list[index]
                         new_path_list.append(
                             {
-                                "point": generators[path_type](path["point"][index]),
+                                "point": generators[path_type](path["point"][point_list[index]]),
                                 "type": path_type
                             }
                         )
