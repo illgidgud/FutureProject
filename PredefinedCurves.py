@@ -89,10 +89,10 @@ class PredefinedCurves:
     class TriangleCurve(SpaceFillingCurve):
         def __init__(self, begin_point: np.array, side_vectors: list):
             increment = [np.round(vector / 2, 7) for vector in side_vectors]
-            point2 = np.round(begin_point - side_vectors[2], 7)
-            point3 = np.round(point2 - side_vectors[1], 7)
-            point4 = np.round(point3 - side_vectors[2], 7)
-            point5 = np.round(point4 + side_vectors[1], 7)
+            point2 = np.round(begin_point - increment[2], 7)
+            point3 = np.round(point2 - increment[1], 7)
+            point4 = np.round(point3 - increment[2], 7)
+            point5 = np.round(point4 + increment[1], 7)
             starting_seed = [{
                 "point": [begin_point, point2, point3, point4, point5],
                 "type": "type1", 

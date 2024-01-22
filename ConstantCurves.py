@@ -68,4 +68,4 @@ class TriangleCurveOne(ConstantCurves):
 
     def const(self, n):
         assert 1 <= n <= self.length, "Giá trị không hợp lệ."
-        return 4 ** n 
+        return 4 ** n
