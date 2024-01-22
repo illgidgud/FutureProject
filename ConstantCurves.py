@@ -61,3 +61,11 @@ class TextBookCurve(ConstantCurves):
         """
         assert 1 <= n <= self.length, "Giá trị không hợp lệ."
         return 2 * 4 ** (n - 1)
+    
+class TriangleCurveOne(ConstantCurves):
+    def __init__(self):
+        super().__init__("TriangleCurveOne")
+
+    def const(self, n):
+        assert 1 <= n <= self.length, "Giá trị không hợp lệ."
+        return 4 ** n 
