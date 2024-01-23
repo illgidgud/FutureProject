@@ -69,3 +69,11 @@ class TriangleCurveOne(ConstantCurves):
     def const(self, n):
         assert 1 <= n <= self.length, "Giá trị không hợp lệ."
         return 4 ** n
+    
+class TriangleCurveTwo(ConstantCurves):
+    def __init__(self):
+        super().__init__("TriangleCurveTwo")
+
+    def const(self, n):
+        assert 1 <= n <= self.length, "Giá trị không hợp lệ."
+        return 4 ** n

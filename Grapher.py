@@ -152,11 +152,11 @@ class SpaceFillingCurve:
             new_points_dict = {k:[point.tolist() for point in self.points_dict[k]] for k in range(1, 6)}
             with open(path, "w") as f:
                 json.dump(new_points_dict, f, indent=2)
-            # for index in [6, 7, 8, 9]:
-            #     path = Path(__file__).parent / f"ConstantCurves/{name}/Curve{index}.json"
-            #     data = [point.tolist() for point in self.points_dict[index]]
-            #     with open(path, "w") as f:
-            #         json.dump(data, f)
+            for index in [6, 7, 8, 9]:
+                path = Path(__file__).parent / f"ConstantCurves/{name}/Curve{index}.json"
+                data = [point.tolist() for point in self.points_dict[index]]
+                with open(path, "w") as f:
+                    json.dump(data, f)
 
     def gen_next_point_list(self, name):
             """
