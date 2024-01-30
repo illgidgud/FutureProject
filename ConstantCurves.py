@@ -77,3 +77,22 @@ class TriangleCurveTwo(ConstantCurves):
     def const(self, n):
         assert 1 <= n <= self.length, "Giá trị không hợp lệ."
         return 4 ** n
+
+class TriangleCurveForPentagon(ConstantCurves):
+    def __init__(self):
+        super().__init__("TriangleCurveForPentagon")
+
+    def const(self, n):
+        assert 1 <= n <= self.length, "Giá trị không hợp lệ."
+        return 4 ** n
+    
+class CircleCurve(ConstantCurves):
+    def __init__(self):
+        super().__init__("CircleCurve")
+
+    def const(self, n):
+        """
+        n = 1, 2, ..., 7 
+        """
+        if n == 2: return 8
+        else: return 4 ** n

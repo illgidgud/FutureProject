@@ -159,10 +159,22 @@ class PredefinedCurves:
                 self._final_path_dict[index + 1] = self.operation(self._final_path_dict[index], increment)
                 self.points_dict[index + 1] = SpaceFillingCurve.from_path_to_points(self._final_path_dict[index + 1])
 
+"""
+[0, 0, 0],
+[2*-5.87785252e-01, 2*-8.09016994e-01,  0.00000000e+00,],
+[2*5.87785252e-01, 2*-8.09016994e-01,  0.00000000e+00,]
+"""
+
+A = np.array([2*-5.87785252e-01, 2*-8.09016994e-01])
+B = np.array([0, 0])
+C = np.array([2*5.87785252e-01, 2*-8.09016994e-01])
+AB = B - A
+BC = C - B
+CA = A - C
+
 triangle_curve = PredefinedCurves.TriangleCurve(
-    np.array([-2, -2]), 
-    [np.array([1, 4], dtype=float), np.array([3, -4], dtype=float), np.array([-4, 0], dtype=float)]
+    A,
+    [AB, BC, CA],
 )
 
-triangle_curve.export_points_as_text("TriangleCurveTwo")
-# triangle_curve.gen_next_point_list("TriangleCurveTwo")
+triangle_curve.export_points_as_text("TriangleCurveForPentagon")
